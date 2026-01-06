@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUXA 完整汉化文档</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 320px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 20px;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .sidebar h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            text-align: center;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-box input:focus {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-category {
+            font-weight: bold;
+            color: rgba(255,255,255,0.8);
+            margin: 20px 0 10px 0;
+            padding-left: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.3);
+            font-weight: bold;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 40px;
+            background: #fff;
+            max-width: 1200px;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-section h1 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .content-section h2 {
+            color: #764ba2;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 4px solid #667eea;
+            font-size: 24px;
+        }
+
+        .content-section h3 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .content-section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .content-section ul, .content-section ol {
+            margin: 15px 0 15px 30px;
+            color: #555;
+        }
+
+        .content-section li {
+            margin-bottom: 8px;
+        }
+
+        .content-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .content-section th, .content-section td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .content-section th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .content-section tr:hover {
+            background: #f8f9fa;
+        }
+
+        .content-section pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content-section code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+            font-size: 0.9em;
+        }
+
+        .content-section pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        .content-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin: 20px 0;
+        }
+
+        .content-section blockquote {
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            color: #555;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .content-section hr {
+            border: none;
+            border-top: 2px solid #eee;
+            margin: 40px 0;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            display: none;
+            transition: all 0.3s;
+            font-size: 24px;
+            z-index: 1000;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .loading::after {
+            content: "加载中...";
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "加载中."; }
+            40% { content: "加载中.."; }
+            60%, 100% { content: "加载中..."; }
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #17a2b8;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .content-section h1 {
+                font-size: 24px;
+            }
+
+            .content-section h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>📚 FUXA 文档</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 搜索文档...">
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li class="nav-category">📖 基础教程</li>
+                <li class="nav-item active" data-section="01">01-主页介绍</li>
+                <li class="nav-item" data-section="02">02-快速入门指南</li>
+                <li class="nav-item" data-section="03">03-安装和运行指南</li>
+                <li class="nav-item" data-section="04">04-设备和标签配置</li>
+                <li class="nav-item" data-section="05">05-组件开发教程</li>
+                <li class="nav-item" data-section="06">06-高级功能配置</li>
+                <li class="nav-item" data-section="07">07-系统设置与使用技巧</li>
+                
+                <li class="nav-category">🔌 集成教程</li>
+                <li class="nav-item" data-section="08">08-Node-RED集成教程</li>
+                <li class="nav-item" data-section="09">09-ODBC数据库集成教程</li>
+                
+                <li class="nav-category">⚙️ 功能教程</li>
+                <li class="nav-item" data-section="10">10-调度器使用教程</li>
+                <li class="nav-item" data-section="11">11-视图管理教程</li>
+                <li class="nav-item" data-section="12">12-WebSocket通信教程</li>
+                <li class="nav-item" data-section="13">13-图表控制教程</li>
+                <li class="nav-item" data-section="14">14-UI布局设置教程</li>
+                <li class="nav-item" data-section="15">15-管道动画教程</li>
+                
+                <li class="nav-category">🎯 高级教程</li>
+                <li class="nav-item" data-section="20">20-系统配置教程</li>
+                <li class="nav-item" data-section="21">21-视图复用教程</li>
+                <li class="nav-item" data-section="22">22-报警配置教程</li>
+                <li class="nav-item" data-section="23">23-项目管理教程</li>
+                <li class="nav-item" data-section="24">24-自定义形状定义教程</li>
+                <li class="nav-item" data-section="25">25-脚本配置教程</li>
+                <li class="nav-item" data-section="26">26-事件配置教程</li>
+                
+                <li class="nav-category">🎨 绑定和开发</li>
+                <li class="nav-item" data-section="27">27-形状绑定教程</li>
+                <li class="nav-item" data-section="28">28-控件绑定教程</li>
+                <li class="nav-item" data-section="29">29-小组件开发教程</li>
+                <li class="nav-item" data-section="30">30-视图创建教程</li>
+                
+                <li class="nav-category">💡 技巧教程</li>
+                <li class="nav-item" data-section="31">31-编辑器快捷键技巧</li>
+            </ul>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <div class="loading"></div>
+        </div>
+    </div>
+
+    <div class="back-to-top" id="backToTop">↑</div>
+
+    <script>
+        // 文档映射
+        const documentFiles = {
+            '01': '01-主页介绍.md',
+            '02': '02-快速入门指南.md',
+            '03': '03-安装和运行指南.md',
+            '04': '04-设备和标签配置.md',
+            '05': '05-组件开发教程.md',
+            '06': '06-高级功能配置.md',
+            '07': '07-系统设置与使用技巧.md',
+            '08': '08-Node-RED集成教程.md',
+            '09': '09-ODBC数据库集成教程.md',
+            '10': '10-调度器使用教程.md',
+            '11': '11-视图管理教程.md',
+            '12': '12-WebSocket通信教程.md',
+            '13': '13-图表控制教程.md',
+            '14': '14-UI布局设置教程.md',
+            '15': '15-管道动画教程.md',
+            '20': '20-系统配置教程.md',
+            '21': '21-视图复用教程.md',
+            '22': '22-报警配置教程.md',
+            '23': '23-项目管理教程.md',
+            '24': '24-自定义形状定义教程.md',
+            '25': '25-脚本配置教程.md',
+            '26': '26-事件配置教程.md',
+            '27': '27-形状绑定教程.md',
+            '28': '28-控件绑定教程.md',
+            '29': '29-小组件开发教程.md',
+            '30': '30-视图创建教程.md',
+            '31': '31-编辑器快捷键技巧.md'
+        };
+
+        let currentSection = '01';
+        let loadedDocuments = {};
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDocument('01');
+            setupEventListeners();
+        });
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 导航菜单点击
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    switchSection(section);
+                });
+            });
+
+            // 搜索功能
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterDocuments(query);
+            });
+
+            // 返回顶部
+            const backToTop = document.getElementById('backToTop');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTop.style.display = 'block';
+                } else {
+                    backToTop.style.display = 'none';
+                }
+            });
+
+            backToTop.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // 切换文档
+        function switchSection(section) {
+            if (currentSection === section) return;
+            
+            currentSection = section;
+            
+            // 更新导航菜单
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-section') === section) {
+                    item.classList.add('active');
+                }
+            });
+
+            // 加载文档
+            loadDocument(section);
+        }
+
+        // 加载文档
+        async function loadDocument(section) {
+            const mainContent = document.getElementById('mainContent');
+            const fileName = documentFiles[section];
+            
+            if (!fileName) {
+                mainContent.innerHTML = '<div class="error">文档未找到</div>';
+                return;
+            }
+
+            // 如果已加载，直接显示
+            if (loadedDocuments[fileName]) {
+                mainContent.innerHTML = loadedDocuments[fileName];
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
+            // 显示加载状态
+            mainContent.innerHTML = '<div class="loading"></div>';
+
+            try {
+                // 尝试从本地文件系统加载
+                const response = await fetch(fileName);
+                if (!response.ok) {
+                    throw new Error('文档加载失败');
+                }
+                
+                const markdown = await response.text();
+                const html = convertMarkdownToHtml(markdown);
+                
+                // 缓存文档
+                loadedDocuments[fileName] = html;
+                
+                // 显示文档
+                mainContent.innerHTML = html;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('加载文档失败:', error);
+                mainContent.innerHTML = `
+                    <div class="error">
+                        <h3>文档加载失败</h3>
+                        <p>无法加载文档: ${fileName}</p>
+                        <p>错误信息: ${error.message}</p>
+                        <p>请确保文档文件存在于正确的位置。</p>
+                    </div>
+                `;
+            }
+        }
+
+        // 简单的 Markdown 转 HTML 转换器
+        function convertMarkdownToHtml(markdown) {
+            let html = markdown;
+
+            // 转换标题
+            html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+            html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+
+            // 转换表格
+            html = html.replace(/\|(.+)\|/gim, function(match) {
+                const cells = match.split('|').filter(cell => cell.trim());
+                if (cells.some(cell => cell.includes('---'))) {
+                    return ''; // 跳过表格分隔行
+                }
+                const cellHtml = cells.map(cell => `<td>${cell.trim()}</td>`).join('');
+                return `<tr>${cellHtml}</tr>`;
+            });
+
+            // 转换代码块
+            html = html.replace(/```(\w+)?\n([\s\S]*?)```/gim, '<pre><code>$2</code></pre>');
+            html = html.replace(/`([^`]+)`/gim, '<code>$1</code>');
+
+            // 转换图片
+            html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/gim, '<img src="$2" alt="$1">');
+
+            // 转换链接
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2" target="_blank">$1</a>');
+
+            // 转换粗体
+            html = html.replace(/\*\*([^*]+)\*\*/gim, '<strong>$1</strong>');
+
+            // 转换斜体
+            html = html.replace(/\*([^*]+)\*/gim, '<em>$1</em>');
+
+            // 转换列表
+            html = html.replace(/^\- (.*)$/gim, '<li>$1</li>');
+            html = html.replace(/^\d+\. (.*)$/gim, '<li>$1</li>');
+
+            // 转换引用
+            html = html.replace(/^> (.*)$/gim, '<blockquote>$1</blockquote>');
+
+            // 转换水平线
+            html = html.replace(/^---$/gim, '<hr>');
+
+            // 转换段落
+            html = html.replace(/\n\n/g, '</p><p>');
+            html = '<p>' + html + '</p>';
+
+            // 清理空段落
+            html = html.replace(/<p>\s*<\/p>/g, '');
+
+            // 修复表格
+            html = html.replace(/(<tr>.*<\/tr>\s*)+/g, function(match) {
+                return '<table>' + match + '</table>';
+            });
+
+            // 修复列表
+            html = html.replace(/(<li>.*<\/li>\s*)+/g, function(match) {
+                return '<ul>' + match + '</ul>';
+            });
+
+            return html;
+        }
+
+        // 过滤文档
+        function filterDocuments(query) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
