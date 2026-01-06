@@ -7092,42 +7092,64 @@ function updateText(newText) {
 </div></p>
         </div>
         <div class="content-section" id="section-32-Node-RED及OPC实现SCADA系统">
-            <h1>[FUXA] 使用Node-RED及OPC实现一个完整的SCADA系统</h1><p>FUXA是一个基于网络的过程可视化（SCADA/HMI/仪表板）软件。通过FUXA，您可以为您的机器创建个性化设计的现代过程可视化和实时数据显示。它支持Modbus RTU/TCP，Siemens S7协议，OPC-UA，BACnet IP，MQTT和其他协议。</p><p>本文主要介绍了如何使用FUXA实现SCADA系统。在本文中，FUXA接收来自Node-RED和OPC UA Simulator的数据，并使用图表和圆形量规显示它；同时，它绘制了一系列模式来模拟工业过程。</p><h2>开始使用</h2><p>在开始此项目之前，您可能需要按照此处所述提前准备硬件和软件。</p><h3>硬件准备</h3><h3>软件准备</h3><p>Python 3.11可能与FUXA不兼容。如果您的Python版本是3.11，请考虑更改为其他Python版本。</p><h2>安装FUXA</h2><p>您需要安装Node Version 14 || 16 || 18。<pre><code class="bash">wget https://nodejs.org/dist/v18.20.3/node-v18.20.3-linux-arm64.tar.xz
-tar -xf node-v18.20.3-linux-arm64.tar.xz
-cd node-v18.20.3-linux-arm64
-sudo cp -R * /usr/local/
-node -v
-npm -v
-</code></pre>接下来从npm安装FUXA：<pre><code class="bash">sudo npm install -g --unsafe-perm @frangoteam/fuxa
-sudo fuxa
-</code></pre><h2>Node-RED数据处理</h2><p>在Node-RED发布的数据是由函数模块处理的，循环模块用于连续发布。函数模块的代码如下：<pre><code class="javascript">// On Start
-global.set('firstTank', '10000');
-global.set('secondTank', '0');
-global.set('thirdTank', '0');</p><p>// On Message
-var firstTank = global.get('firstTank');
-var secondTank = global.get('secondTank');
-var thirdTank = global.get('thirdTank');</p><p>if (firstTank <= 0) {
-    global.set('firstTank', 10000);
-    global.set('secondTank', 0);
-    global.set('thirdTank', 0);
-    firstTank = 10000;
-    secondTank = 0;
-    thirdTank = 0;
-}</p><p>firstTank = firstTank - 3;
-secondTank++;
-thirdTank++;
-thirdTank++;</p><p>global.set('firstTank', firstTank);
-global.set('secondTank', secondTank);
-global.set('thirdTank', thirdTank);</p><p>var data = {
-    "firstTank": firstTank,
-    "secondTank": secondTank,
-    "thirdTank": thirdTank,
-};
-msg.payload = data;
-return msg;
-</code></pre>需要将firstTank、secondTank和thirdTank封装成JSON格式，然后让mqtt-out模块发布它。</p><h2>FUXA配置</h2><h3>添加内部设备</h3><p>点击FUXA右下角的+按钮，输入Name，Type，选择Internal，最后点击OK得到一个新模块。</p><p>该模块不具有与外部设备通信的功能，但它允许我们添加自定义标签。这些标签支持boolean、number和string三种数据类型，可以方便我们后续的工作。</p><h3>硬件配置</h3><p>我们使用以太网电缆将W10 PC和R1000连接到交换机，以确保它们位于同一网段。</p><h2>显示和主要控制介绍</h2><h3>图表</h3><p>FUXA中有曲线图和直方图。以曲线图为例。</p><p>图表的属性如图所示。您可以设置图表的名称、字体大小、数据格式、时间格式、X轴和Y轴样式以及其他属性。</p><p>最重要的是要显示的Chart，它决定了我们要显示的数据源和行的格式。</p><p>我们点击Chart显示，然后选择New Chart，会出现一个新的弹出窗口，点击新弹出窗口右上角的+按钮，输入Name，然后点击OK，就可以成功新建一条线配置了。</p><p>然后点击新建的线配置，然后点击Add Line，选择要显示的数据，最后点击OK，就会出现一条新的曲线。可以通过此过程添加多条曲线。最后单击OK完成配置。</p><p>我们在这里使用Chart来显示来自Prosys OPC UA Simulation Server的数据。您可以看到数据以图表的形式成功显示。</p><h3>Switch 开关</h3><p>开关的属性如图所示。我们选择一个名为switch_1的布尔数据作为开关状态。</p><p>您可以配置开关在打开或关闭时的显示状态，包括颜色配置，文本显示等。</p><h3>形状</h3><p>FUXA提供了多种形状供用户绘制工业可视化界面。每个形状都有三个属性，即属性、事件和操作。</p><p>其中，Property主要用于配置形状的颜色。通过绑定标记，形状将根据标记值的更改显示不同的颜色。您可以点击右上角的+来设置不同的颜色。</p><p>这里我们以仓库模式为例，用Property填充它的颜色。</p><p>Events主要有两个内容，Type表示事件类型，Action表示事件触发后的动作。</p><p>操作需要绑定到一个Tag，以及不同的Tag值可以触发不同的动作。设置值的最小值和最大值，然后在"类型"选项中选择所需的操作。当Tag数据达到Min和Max之间的间隔时，将触发相应的操作。</p><p>这里我们以仓库模式为例，通过Actions控制其旋转和停止。</p><h3>Pipe 管道</h3><p>在显示工业流程时，可以使用管道来表示工业物料的流向。</p><p>管道的属性如图所示。属性部分可以设置管道的宽度、颜色和其他属性。</p><p>动作也需要绑定到一个标签。不同的标记值允许管道具有不同的动作。有四个主要的动作：停止，顺时针旋转，逆时针旋转和隐藏内容。</p><p>本文展示了两个操作：停止和顺时针旋转。为了模拟工业过程，我们添加了两个水箱和一些管道等图案。</p><h3>Circular Gauge 圆形量规</h3><p>除了图表外，Circular Gauge还可以真实的实时显示数据。有三种圆形量规可供选择，可以根据需要配置不同的显示样式和数据范围。</p><hr><p><strong>技术支持：科控物联</strong>
-<ul><li>QQ: 2492123056</li>
-</ul></p>
+            <p>我们在node-red发布的数据是由函数模块处理的，循环模块用于连续发布。函数模块的代码如下：</p><p><h2>On Start</h2>
+  global.set('firstTank', '10000');
+  global.set('secondTank', '0');
+  global.set('thirdTank', '0');
+<h2>On Message</h2>
+  var firstTank = global.get('firstTank');
+  var secondTank = global.get('secondTank');
+  var thirdTank = global.get('thirdTank');
+  if (firstTank <= 0) {
+      global.set('firstTank', 10000);
+      global.set('secondTank', 0);
+      global.set('thirdTank', 0);
+      firstTank=10000;
+      secondTank=0;
+      thirdTank=0;
+  }</p><p>  firstTank = firstTank - 3;
+  secondTank++;
+  thirdTank++;
+  thirdTank++;
+  global.set('firstTank',firstTank);
+  global.set('secondTank',secondTank);
+  global.set('thirdTank',thirdTank);
+  var data = {
+      "firstTank":firstTank,
+      "scondTank":secondTank,
+      "thirdTank":thirdTank,
+  };
+  msg.payload = data;
+  return msg;
+要是将firstTank、secondTank和thirdTank封装成json格式，然后让mqtt-out模块发布它。</p><p>
+点击fuxa右下角的+按钮，输入Name，Type，选择Internal，最后点击OK得到一个新模块。该模块不具有与外部设备通信的功能，但它允许我们添加自定义标签。这些标签支持boolean、number和string三种数据类型，可以方便我们后续的工作。</p><p><img src="images/fuxa-device.gif" alt="添加设备"></p><p>  硬件配置
+我们使用以太网电缆将W10 PC和R1000连接到交换机，以确保它们位于同一网段。</p><p>
+显示和主要控制介绍
+  图表
+fuxa中有曲线图和直方图。以曲线图为例。图表的属性如图所示。您可以设置图表的名称、字体大小、数据格式、时间格式、X轴和Y轴样式以及其他属性。最重要的是要显示的Chart，它决定了我们要显示的数据源和行的格式。</p><p><img src="images/fuxa-chart.gif" alt="图表属性"></p><p>
+我们点击Chart显示，然后选择New Chart，会出现一个新的弹出窗口，点击新弹出窗口右上角的+按钮，输入Name，然后点击OK，就可以成功新建一条线配置了。然后点击新建的线配置，然后点击Add Line，选择要显示的数据，最后点击OK，就会出现一条新的曲线。可以通过此过程添加多条曲线。最后单击OK完成配置。</p><p>
+我们在这里使用Chart来显示来自 Prosys OPC UA Simulation Server 的数据。您可以看到数据以图表的形式成功显示。</p><p><img src="images/fuxa-chart2.gif" alt="图表显示"></p><p>
+  
+Swich 开关
+开关的属性如图所示。我们选择一个名为swich_1的布尔数据作为开关状态。您可以配置开关在打开或关闭时的显示状态，包括颜色配置，文本显示等。</p><p><img src="images/fuxa-control.gif" alt="开关属性"></p><p>
+  形状
+Fuxa提供了多种形状供用户绘制工业可视化界面。每个形状都有三个属性，即属性、事件和操作。其中，Property主要用于配置形状的颜色。通过绑定标记，形状将根据标记值的更改显示不同的颜色。您可以点击右上角的+来设置不同的颜色。</p><p><img src="images/fuxa-shapes.gif" alt="形状属性"></p><p>
+这里我们以仓库模式为例，用Property填充它的颜色。</p><p>
+Events主要有两个内容，Type表示事件类型，Action表示事件触发后的动作。</p><p>
+操作需要绑定到一个Tag，以及不同的Tag值 可以触发不同的动作。设置值 的最小值和最大值，然后在“类型”选项中选择所需的操作。当Tag数据达到Min和Max之间的间隔时，将触发相应的操作。</p><p>
+这里我们以仓库模式为例，通过Actions控制其旋转和停止。</p><p>
+Pipe  管
+在显示工业流程时，可以使用管道来表示工业物料的流向。管道的属性如图所示。</p><p><img src="images/fuxa-pipe.gif" alt="管道属性"></p><p>
+属性部分可以设置管道的宽度、颜色和其他属性。动作也需要绑定到一个标签。不同的标记值 允许管道具有不同的动作。有四个主要的动作：停止，顺时针旋转，逆时针旋转和隐藏内容。本文展示了两个操作：停止和顺时针旋转。</p><p>
+为了模拟工业过程，我们添加了两个水箱和一些管道等图案。</p><p>
+Circular Gauge  圆形量规
+除了图表外，Circular Gauge还可以真实的实时显示数据。有三种圆形量规可用。</p><p>使用时，需要通过绑定Tag指定要显示的数据。同时，您需要指定仪器可以显示的最大数据范围。您也可以在仪表板上设置线条等属性，这里我们选择/dev/fromfuxa主题中Tank 1的数据进行显示。</p><p>之后，2号和3号罐的数据也通过圆形仪表显示，以指示每个罐的当前容量。</p><p>
+  滑块
+使用滑块调整流量、压力等变量，其属性如图所示。您可以设置其颜色和格式。使用时，需要绑定一个Tag。然后，滑块可以真实的调整Tag的值。这里我们绑定一个自定义的Flow control 1标签</p><p><img src="images/fuxa-slider-control.gif" alt="滑块属性"></p><p>
+ 报警
+在工业生产过程中，某些参数（如压力）过大可能会造成一些危险。这时就需要报警，提醒工作人员这里可能有问题。Fuxa支持实时监控某一数值，当数值达到一定危险范围时触发报警。默认情况下，fuxa的界面不会打开报警栏。你需要设置它来打开警报栏。</p><p><img src="images/fuxa-alarms.gif" alt="报警设置"></p><p>
+打开闹钟栏后，您可以设置闹钟。单击左上角的设置按钮，然后单击警报，然后在新窗口中单击+，显示警报设置窗口。此时需要绑定一个Tag，系统会监控Tag的值。警报有四个级别，即High High、High、Low、Message。您可以为每个级别设置一个Tag值范围，当Tag值达到该范围时，将触发相应级别的警报。</p><p>
+  SCADA演示</p>
         </div>
         </div>
     </div>
