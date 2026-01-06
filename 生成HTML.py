@@ -41,8 +41,22 @@ def markdown_to_html(markdown):
     # 转换图片
     html = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', r'<img src="\2" alt="\1">', html)
 
-    # 转换链接
-    html = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2" target="_blank">\1</a>', html)
+    # 转换链接 - 区分内部文档链接和外部链接
+    def convert_link(match):
+        text = match.group(1)
+        url = match.group(2)
+        # 检查是否是内部文档链接（以.md结尾）
+        if url.endswith('.md'):
+            # 转换为锚点跳转
+            # 移除可能的 ./ 前缀
+            clean_url = url.replace('./', '')
+            section_id = clean_url.replace('.md', '')
+            return f'<a href="#section-{section_id}" class="internal-link">{text}</a>'
+        else:
+            # 外部链接，在新窗口打开
+            return f'<a href="{url}" target="_blank">{text}</a>'
+    
+    html = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', convert_link, html)
 
     # 转换无序列表
     html = re.sub(r'^- (.*)$', r'<li>\1</li>', html, flags=re.MULTILINE)
@@ -127,7 +141,7 @@ def markdown_to_html(markdown):
 def read_markdown_files(directory):
     documents = {}
     for file in sorted(os.listdir(directory)):
-        if file.endswith('.md'):
+        if file.endswith('.md') and file != 'README.md':
             file_path = os.path.join(directory, file)
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -507,6 +521,43 @@ def generate_html(documents, output_file):
             backToTop.addEventListener('click', function() {{
                 window.scrollTo({{ top: 0, behavior: 'smooth' }});
             }});
+
+            // 处理hash变化，显示对应的section
+            function handleHashChange() {{
+                const hash = window.location.hash;
+                if (hash && hash.startsWith('#section-')) {{
+                    // 解码URL编码的中文
+                    const sectionId = decodeURIComponent(hash.replace('#section-', ''));
+                    
+                    // 隐藏所有section
+                    contentSections.forEach(sec => sec.classList.remove('active'));
+                    
+                    // 移除所有导航项的active类
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    
+                    // 显示目标section
+                    const targetSection = document.getElementById('section-' + sectionId);
+                    if (targetSection) {{
+                        targetSection.classList.add('active');
+                    }}
+                    
+                    // 更新导航菜单的active状态
+                    navItems.forEach(nav => {{
+                        if (nav.getAttribute('data-section') === sectionId) {{
+                            nav.classList.add('active');
+                        }}
+                    }});
+                    
+                    // 滚动到顶部
+                    window.scrollTo({{ top: 0, behavior: 'smooth' }});
+                }}
+            }}
+
+            // 监听hash变化
+            window.addEventListener('hashchange', handleHashChange);
+            
+            // 页面加载时检查hash
+            handleHashChange();
         }});
     </script>
 </body>
@@ -529,7 +580,7 @@ def main():
     print(f"✅ 已读取 {len(documents)} 个文档")
     
     # 生成HTML文件
-    output_file = os.path.join(current_dir, 'FUXA汉化文档_完整版.html')
+    output_file = os.path.join(current_dir, 'FUXA中文手册_完整版.html')
     print("🔄 正在生成HTML文件...")
     generate_html(documents, output_file)
     
