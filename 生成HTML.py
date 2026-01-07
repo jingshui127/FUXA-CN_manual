@@ -137,9 +137,10 @@ def markdown_to_html(markdown):
 
     return html
 
-# 读取所有Markdown文件
+# 读取案例1的Markdown文件
 def read_markdown_files(directory):
     documents = {}
+    # 读取所有Markdown文件，除了README.md
     for file in sorted(os.listdir(directory)):
         if file.endswith('.md') and file != 'README.md':
             file_path = os.path.join(directory, file)
@@ -154,7 +155,17 @@ def generate_html(documents, output_file):
     nav_items = []
     for i, (filename, _) in enumerate(sorted(documents.items())):
         section_id = filename.replace('.md', '')
-        title = filename.replace('.md', '').replace('-', ' ')
+        # 从文件名提取标题
+        if filename.startswith('案例'):
+            # 案例文件：案例1-连接MQTT服务器实现SCADA.md -> 案例1: 连接MQTT服务器实现SCADA
+            parts = filename.replace('.md', '').split('-', 1)
+            if len(parts) == 2:
+                title = f"{parts[0]}: {parts[1]}"
+            else:
+                title = filename.replace('.md', '')
+        else:
+            # 教程文件：01-主页介绍.md -> 01. 主页介绍
+            title = filename.replace('.md', '').replace('-', '. ')
         nav_items.append(f'<li class="nav-item" data-section="{section_id}">{title}</li>')
 
     # 生成内容区域
